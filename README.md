@@ -40,10 +40,10 @@ Python.
 
 ## Changing the setup
 
-Here is a list of parameters that can be changed and where they are to be found.
-All the parameters of the code are stored within classes in the *parameters.py* file.
+Here is a list of parameters that must be specified by the user in order for BootSTOP to operate, they are all stored 
+within classes in the *parameters.py* file.
 
-Within the class *parameters_6d*. These alter the conformal blocks.
+Within the class *ParametersSixD*. These alter the conformal blocks.
 - **inv_c_charge:** This is the inverse of the central charge of the CFT.
 - **spin_list_short_d:** This is the spin of the D multiplet.
 - **spin_list_short_b:** This is a list of spins for the B multiplets.
@@ -56,8 +56,8 @@ in the pregenerated conformal blocks.
 - **z_kill_list:** Allows for a smaller z-point sample by specifying which points to remove.
 
 
-Within the subclass *parameters_6d_sac*. These alter the soft-Actor-Critic behaviour.
-- **filename:** The name of the output file (note the filetype *.csv* is automatically appended along with an 
+Within the subclass *Parameters_6D_sac*. These alter the soft-Actor-Critic behaviour.
+- **filename_stem:** The name of the output file (note the filetype *.csv* is automatically appended along with an 
 optional integer - see Running the Code).
 - **verbose:** Controls how much output is printed to the python console.
 - **faff_max:** The maximum number of iterations spent not improving the reward.
@@ -66,15 +66,14 @@ optional integer - see Running the Code).
 - **max_window_exp:** The maximum number of search window size decreases.
 - **same_spin_hierarchy:** Boolean flag to impose a separation in conformal weights of degenerate long multiplets.
 - **dyn_shift:** Value for the separation of conformal weights of degenerate long multiplets.
-- **global_guessing_run:** Boolean for overall guessing status.
 - **guessing_run_list_deltas:** Set guessing status for individual unknown conformal weights.
 - **guessing_run_list_opes:** Set guessing status for individual unknown OPE squared coefficients.
 - **guess_sizes_deltas:** The initial sizes of the search windows for the conformal weights.
 - **guess_sizes_opes:** The initial sizes of the search windows for the OPE squared coefficients.
 - **shifts_deltas:** The lower bounds for the conformal weights.
-- **shifts_opes:** The lower bounds for the OPE squared coefficients.
+- **shifts_opecoeffs:** The lower bounds for the OPE squared coefficients.
 - **global_best:** Initial set of CFT data for algorithm to explore around.
-- **global_reward_reset:** Initial reward for algorithm to improve upon.
+- **global_reward_start:** Initial reward for algorithm to improve upon.
 
 The sample of points in the complex plane is stored within *environment/data_z_sample.py*. Altering the entries 
 contained within `zre` or `zim` would mean having to re-compute all the *block_lattices/6d_blocks_spin#.csv* files in 
@@ -94,7 +93,7 @@ of the conformal weights is set with `step` (we used 0.0005). The Mathematica co
 for all values of $z, \bar{z}$ in the z-sample with $\Delta$ starting at `floor` and increasing by `step` with 
 each pass of the loop until it reaches `ceiling`. Once the loop is completed the output is exported to a csv file.
 In practice setting `ceiling = floor - step + 1` with `step = 0.0005` allows the loop to complete in a reason amount
-of time (~ x hours) and a wide range for $\Delta$ (up to `floor + 30`) can be built up by running in parallel on a 
+of time (~75mins) and a wide range for $\Delta$ (up to `floor + 30`) can be built up by running in parallel on a 
 cluster. The final, large, csv file *6d_blocks_spin0.csv* is formed by running the script 
 *pregenerate_blocks/aggregate_block_data.py* with approriate values set for the variables.
 
