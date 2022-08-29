@@ -17,6 +17,8 @@ def generate_block_list(max_spin, z_kill_list):
     block_list : list
         A list of ndarrays containing pregenerated conformal block data.
     """
+    # since this takes a long time give the user some feedback
+    print('Loading pregenerated conformal block data.')
     block_list = []
     for i in range(0, max_spin + 2, 2):
         tmp_name = 'block_lattices/6d_blocks_spin' + str(i) + '.csv'
@@ -27,7 +29,7 @@ def generate_block_list(max_spin, z_kill_list):
         # otherwise delete the columns which appear in z_kill_list and then append
         else:
             block_list.append(np.delete(tmp, z_kill_list, axis=1))
-    # since this takes a long time give the user some feedback
+
     print('Done loading pregenerated conformal block data.')
     return block_list
 
