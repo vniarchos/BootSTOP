@@ -36,14 +36,14 @@ def generate_block_list(max_spin, z_kill_list):
 
 def output_to_file(file_name, output):
     """
-    Appends output to a file.
+    Appends row of output to a file.
 
     Parameters
     ----------
     file_name : str
         Filename of a writer object.
-    output : str
-        The string to be appended to the write object.
+    output : iterable of strings or numbers
+        The parameter passed to writer.writerow.
 
     """
     with open(file_name, 'a', newline='') as f_object:
