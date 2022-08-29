@@ -28,8 +28,7 @@ class Environment:
         self.lower_bounds = lower_bounds
         self.search_window_sizes = search_window_sizes
         self.guessing_run_list = guessing_run_list
-        self.current_location = np.zeros(self.search_space_dim, dtype=np.float32)
-        # TODO set current_location equal to lower_bounds?
+        self.current_location = lower_bounds
         self.current_constraints = np.zeros(self.environment_dim, dtype=np.float32)
         self.current_reward = None
         self.reward_improved = False
@@ -47,12 +46,9 @@ class Environment:
         solution : ndarray
             The solution which corresponds to the location at which `largest` is evaluated.
         """
-        self.current_location = np.copy(action)
-        # TODO remove line above?
         # updating location might be a theory dependent thing i.e. allowing some to be negative
-        self.current_location = self.lower_bounds + abs(self.search_window_sizes * self.current_location
+        self.current_location = self.lower_bounds + abs(self.search_window_sizes * action
                                                         + (1 - self.guessing_run_list) * solution)
-        # TODO change current_location to action on RHS?
 
         # evaluate the function at the updated location and update attributes
         self.current_constraints, self.current_reward, self.current_location \
@@ -64,10 +60,9 @@ class Environment:
 
     def reset_env(self):
         """
-        Resets the current_constraints, current_reward, current_location and reward_improved attributes.
+        Resets the current_constraints, current_location and reward_improved attributes.
         """
         self.current_constraints = np.zeros(self.environment_dim, dtype=np.float32)
-        self.current_reward = 0.0
         self.current_location = self.lower_bounds
         self.reward_improved = False
 
@@ -80,29 +75,6 @@ class Learn:
     ----------
     env: Environment
         Instance of `Environment` class.
-
-    Attributes
-    ----------
-    agent : Agent
-        Instance of `Agent` class.
-    done : bool
-        Flag used to fill terminal_memory of ReplayBuffer
-    fdone : bool
-        Another flag.
-    observation : ndarray
-        NumPy array.
-    observation_ : ndarray
-        Blah.
-    step : int
-        Counter which records how many iterations have been completed.
-    faff : int
-        Counter which records how many step have been taken since reward was improved.
-    solution : ndarray
-        Array. This is
-    productivity_counter : bool
-        Flag which records whether reward has improved.
-    rewards : list
-        A list of
     """
     def __init__(self, env):
         self.env = env
@@ -120,38 +92,24 @@ class Learn:
     def loop(self, window_scale_exponent, file_name, array_index, current_best, faff_max, verbose, output_order=''):
         """
         Loop which implements neural net learning and exploration of parameter space landscape.
-
-        Parameters
-        ----------
-        window_scale_exponent
-        file_name
-        array_index
-        current_best
-        faff_max
-        verbose
-        output_order
-
-        Returns
-        -------
-        solution : ndarray
         """
         self.solution = current_best
         self.productivity_counter = False
         while not self.fdone:
             # ---Running the learning loop---
             self.step += 1
-            # get a prediction from the neural net
+            # get a prediction from the neural net based on observation
             action = self.agent.choose_action(self.observation)  # returns values in range [-1,1]
             # move to a new location based on neural net prediction and evaluate function there
             self.env.move(action, max(self.rewards), self.solution)
-            self.observation_ = self.env.current_constraints
+            self.observation_ = self.env.current_constraints  # the new obervation
             current_reward = self.env.current_reward
             current_location = self.env.current_location
             # update the neural net buffer with the latest data
             self.agent.remember(self.observation, action, current_reward, self.observation_, self.done)
             # learn from updated buffer
             self.agent.learn()
-            self.observation = self.observation_
+            self.observation = self.observation_  # update observation to be the current constraints
             # append the current reward to the list of previous rewards generated within the loop
             self.rewards.append(current_reward)
 
@@ -212,7 +170,7 @@ def soft_actor_critic(func,
     Parameters
     ----------
     func : callable
-        The reward function to be maximised.
+        The function to be maximised.
     environment_dim : int
         The number of points in the complex plane the function is evaluated at.
     search_space_dim : int
@@ -222,11 +180,11 @@ def soft_actor_critic(func,
     window_decrease_rate : float
         Search window size decrease rate. Value should be between 0 and 1.
     pc_max : int
-        Maximum number of reinitialisations before search window decrease occurs.
+        Maximum number of reinitialisations before search window decrease triggered.
     file_name : str
         The filename where output is to be saved.
     array_index : int
-        sfjhfjgh
+        An index which can be used to identify output data.
     starting_reward : float
         Initial reward value for SAC algorithm to try and beat.
     x0 : ndarray
@@ -246,7 +204,7 @@ def soft_actor_critic(func,
         - `e`: print everytime reward is recalculated.
         - `o`: only after a reinitialisation.
     args : tuple, optional
-        Any additional fixed parameters needed to completely specify the reward function.
+        Any additional fixed parameters needed to completely specify the function.
 
     Notes
     -----
