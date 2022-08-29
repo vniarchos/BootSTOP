@@ -122,6 +122,7 @@ class ParametersSixD_SAC(ParametersSixD):
         Initial size of search windows for the conformal weights. They need not all be the same value.
         The guess_sizes of short D and B multiplets should be set to 0 as their weights are fixed.
         There is an implicit upper bound set by the highest weight in the pregenerated conformal block csv files.
+        They need not all be the same value.
     guess_sizes_opes : ndarray
         Initial size of search windows for the OPE-squared coefficients. They need not all be the same value.
     shifts_deltas : ndarray
@@ -152,7 +153,7 @@ class ParametersSixD_SAC(ParametersSixD):
         super().__init__()
 
         # ---Output Parameters---
-        self.filename_stem = 'sac'
+        self.filename_stem = 'sac_v2_'
         self.verbose = 'o'  # When the SAC algorithm should print to the console:
         # e - print at every step
         # o - only after a reinitialisation
