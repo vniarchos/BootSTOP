@@ -39,9 +39,9 @@ class CrossingSixD:
         self.use_scipy_for_hypers = True  # compute the hypergeometrics using scipy package or mpmath
         self.block_list = block_list
 
-        self.inho_value = self.inhomo_z_vector()
-        self.short_d_hypers = self.short_coeffs_d_multiplet()
-        self.short_b_hypers = self.short_coeffs_b_multiplet_array()
+        self.INHO_VALUE = self.inhomo_z_vector()
+        self.SHORT_D_HYPERS = self.short_coeffs_d_multiplet()
+        self.SHORT_B_HYPERS = self.short_coeffs_b_multiplet_array()
 
     def h(self, z):
         """Computes h(z) defined in eqn (3.21) of 1507.05637."""
@@ -232,9 +232,9 @@ class CrossingSixD:
         # we clip delta to ensure that it lies within the range accessible in the pregenerated blocks
         delta = np.clip(delta, a_min=None, a_max=self.delta_start[ell] + self.delta_end_increment - self.delta_sep)
         # used a_min=None in delta because a lower bound is enforced by choosing shifts_deltas in the parameters.py file
-        # now we find how much lattice points delta corresponds to
+        # now we find the nearest lattice point delta corresponds to
         n = np.rint((delta - self.delta_start[ell]) / self.delta_sep)
-        # get the appropriate contribution from block_list
+        # get the appropriate contribution from block_list based on spin and lattice point
         long_c = self.block_list[ell][int(n)]
         # we need to transpose to return a shape compatible with the short multiplet contributions
         return np.transpose(long_c)
@@ -252,6 +252,16 @@ class CrossingSixD:
             long_c = np.vstack((long_c, self.long_cons(deltas[x], self.spin_list_long[x])))
         return long_c
 
+
+class CrossingSixD_SAC(CrossingSixD):
+
+    def __init__(self, block_list, params, z_data):
+        super().__init__(block_list, params, z_data)
+
+        self.same_spin_hierarchy_deltas = params.same_spin_hierarchy  # impose weight separation flag
+        self.dyn_shift = params.dyn_shift  # the weight separation value
+        self.dup_list = self.spin_list_long == np.roll(self.spin_list_long, -1)  # which long spins are degenerate
+
     def split_cft_data(self, cft_data):
         """
         Sets up dictionaries to decompose the search space data into easily identifiable pieces.
@@ -259,7 +269,7 @@ class CrossingSixD:
         Parameters
         ----------
         cft_data : ndarray
-            The array to be decomposed.
+            The array to be split.
 
         Returns
         -------
@@ -280,16 +290,6 @@ class CrossingSixD:
             "long": cft_data[self.multiplet_index[2] + self.action_space_N // 2]
         }
         return delta_dict, ope_dict
-
-
-class CrossingSixD_SAC(CrossingSixD):
-
-    def __init__(self, block_list, params, z_data):
-        super().__init__(block_list, params, z_data)
-
-        self.same_spin_hierarchy_deltas = params.same_spin_hierarchy  # impose weight separation flag
-        self.dyn_shift = params.dyn_shift  # the weight separation value
-        self.dup_list = self.spin_list_long == np.roll(self.spin_list_long, -1)  # which long spins are degenerate
 
     def impose_weight_separation(self, delta_dict):
         """
@@ -356,19 +356,19 @@ class CrossingSixD_SAC(CrossingSixD):
 
         if len(delta_dict['short_d']) == 0:
             # broadcast a zero ope coefficient over the crossing contributions
-            short_cons_d_multiplet = 0 * self.short_d_hypers
+            short_cons_d_multiplet = 0 * self.SHORT_D_HYPERS
         else:
             # broadcast the D multiplet ope coefficient over the crossing contributions
-            short_cons_d_multiplet = ope_dict['short_d'] * self.short_d_hypers
+            short_cons_d_multiplet = ope_dict['short_d'] * self.SHORT_D_HYPERS
 
         # broadcast the reshaped B multiplet ope coefficients over their crossing contributions
-        short_cons_b_multiplet = ope_dict['short_b'].reshape(-1, 1) * self.short_b_hypers
+        short_cons_b_multiplet = ope_dict['short_b'].reshape(-1, 1) * self.SHORT_B_HYPERS
         # broadcast the reshaped long multiplet ope coefficients over their crossing contributions
         long_cons = ope_dict['long'].reshape(-1, 1) * self.long_coeffs_array(delta_dict['long'])
         # long_cons.shape = (num_of_long, env_shape)
 
         # add up all the components
-        constraints = self.inho_value + short_cons_d_multiplet + short_cons_b_multiplet.sum(axis=0) \
+        constraints = self.INHO_VALUE + short_cons_d_multiplet + short_cons_b_multiplet.sum(axis=0) \
                       + long_cons.sum(axis=0)  # the .sum implements summation over multiplet spins
         reward = 1 / LA.norm(constraints)
 
