@@ -13,37 +13,36 @@
 <!-- TOC -->
 
 ## Overview
-This code applies the soft actor critic algorithm to solve a truncated crossing equation 
-for a conformal field theory (CFT). See references [1], [2] and [3] for comprehensive background.
+This code applies the Soft-Actor-Critic (SAC) algorithm to optimization problems that arise in the study of truncated crossing equations 
+in Conformal Field Theories (CFTs). See references [1], [2] and [3] for comprehensive background.
 
-The code tries to maximise a reward. Each time an improved reward is found that reward and the corresponding CFT data 
+The code is designed to maximise a reward. Each time an improved reward is found that reward and the corresponding CFT data 
 (conformal weights and OPE squared coefficients) are saved to a csv file.
 
 ## Getting started
 
-In this readme file we will describe how to quickly get started with using the
-code. First things first, you will need to follow this [link](https://drive.google.com/drive/folders/1XwQmNnuCCUlXqT9MFmFNyFdTS_Ob_2lM?usp=sharing)
+In this README file we will describe how to quickly get started using the code. First, you will need to follow this [link](https://drive.google.com/drive/folders/1XwQmNnuCCUlXqT9MFmFNyFdTS_Ob_2lM?usp=sharing)
 to download the pregenerated conformal block csv files (each file is around 0.2Gb) and place them within the *block_lattices* 
 folder.
 
 ## Running the Code
 
-The main file for running the code is *run_sac.py*. Running it is simple, all you have to do is execute the following in the terminal:
+The main file running the code is *run_sac.py*. To run this file, execute the following in the terminal:
 
 `python run_sac.py array`
 
 where `array` is an _optional_ integer which is incorporated in the csv filename 
-which the code creates and outputs to. This flexibliity allows for the use of a cluster to 
+that the code creates and outputs to. This flexibliity allows for the use of a cluster to 
 run many instances of BootSTOP in parallel.
 You might need to change "python" to "python3" depending on your installation of
 Python.
 
 ## Changing the setup
 
-Here is a list of parameters that must be specified by the user in order for BootSTOP to operate, they are all stored 
+Here is a list of parameters that must be specified by the user in order for BootSTOP to operate. They are all stored 
 within classes in the *parameters.py* file.
 
-Within the class *ParametersSixD*. These alter the conformal blocks.
+Within the class *ParametersSixD*. These parameters alter the conformal blocks.
 - **inv_c_charge:** This is the inverse of the central charge of the CFT.
 - **spin_list_short_d:** This is the spin of the D multiplet.
 - **spin_list_short_b:** This is a list of spins for the B multiplets.
@@ -56,7 +55,7 @@ in the pregenerated conformal blocks.
 - **z_kill_list:** Allows for a smaller z-point sample by specifying which points to remove.
 
 
-Within the subclass *Parameters_6D_sac*. These alter the soft-Actor-Critic behaviour.
+Within the subclass *Parameters_6D_sac*. These parameters alter the soft-Actor-Critic behaviour.
 - **filename_stem:** The name of the output file (note the filetype *.csv* is automatically appended along with an 
 optional integer - see Running the Code).
 - **verbose:** Controls how much output is printed to the python console.
@@ -81,18 +80,18 @@ order to avoid inconsistencies.
 
 ## Changing the pregenerated conformal blocks 
 
-The pregenerated conformal blocks are computed using Mathematica in tandem with QMUL's Apocrita high performance
-compute cluster. Here we describe how the spin 0 blocks were generated using the file 
+The pregenerated conformal blocks are computed using Mathematica in tandem with QMUL's Apocrita High Performance
+Compute Cluster. Here we describe how the spin 0 blocks were generated using the file 
 *pregenerate_blocks/genblocks_6d_spin0.m*. Higher spins follow the same procedure 
 with a suitable change of `spin` variable. 
 
 First the choice of the sampling of the z-plane was made with the real and imaginary parts stored in the variables
-`zre` and `zim`. Next a lower bound for the conformal weight is set within `floor`, we have consistently used 0.2 below 
+`zre` and `zim`. Next a lower bound for the conformal weight is set within `floor`. We have consistently used 0.2 below 
 the long multiplet unitarity bound so that the BootSTOP code can explore around that bound. Finally, the discretisation
 of the conformal weights is set with `step` (we used 0.0005). The Mathematica code then loops evaluating the expression $$z \bar{z} a_{\Delta, \ell=0}^{\rm{at}} (z, \bar{z}) - (1-z)(1-\bar{z}) a_{\Delta, \ell=0}^{\rm{at}} (1-z, 1-\bar{z}),$$ where $a_{\Delta, \ell}^{\rm{at}}$ is defined in equation (4.5) of [arXiv:1507.05637](https://arxiv.org/pdf/1507.05637.pdf),
 for all values of $z, \bar{z}$ in the z-sample with $\Delta$ starting at `floor` and increasing by `step` with 
 each pass of the loop until it reaches `ceiling`. Once the loop is completed the output is exported to a csv file.
-In practice setting `ceiling = floor - step + 1` with `step = 0.0005` allows the loop to complete in a reason amount
+In practice setting `ceiling = floor - step + 1` with `step = 0.0005` allows the loop to complete in a reasonable amount
 of time (~75mins) and a wide range for $\Delta$ (up to `floor + 30`) can be built up by running in parallel on a 
 cluster. The final, large, csv file *6d_blocks_spin0.csv* is formed by running the script 
 *pregenerate_blocks/aggregate_block_data.py* with approriate values set for the variables.
