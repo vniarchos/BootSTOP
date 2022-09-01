@@ -28,27 +28,25 @@ class ParametersSixD:
 
     def __init__(self):
         # ---Central charge---
-        self.inv_c_charge = 1 / 25  # This is the inverse central charge (we can set it to 0 nicely i.e. infinite c)
+        self.inv_c_charge = 0.0  # This is the inverse central charge (we can set it to 0 nicely i.e. infinite c)
 
         # ---Spin partition---
         # Note: spins HAVE to be given in ascending order
         self.spin_list_short_d = np.array([0])  # This can only be [] or [0]
-        self.spin_list_short_b = np.array([2, 4, 6, 8, 10, 12, 14, 16])  # This cannot be empty
+        self.spin_list_short_b = np.array([2, 4, 6, 8, 10, 12, 14, 16, 18])  # This cannot be empty
         self.spin_list_long = np.array([0, 0, 0, 0, 0, 0, 0, 0,
                                         2, 2, 2, 2, 2, 2, 2,
                                         4, 4, 4, 4, 4, 4,
                                         6, 6, 6, 6, 6,
                                         8, 8, 8, 8,
                                         10, 10, 10,
-                                        12, 12,
-                                        14])  # This cannot be empty but can have repeated entries
-        # ---This is needed for the inhomogeneous part of the 6d crossing equation---
+                                        12, 12])  # This cannot be empty but can have repeated entries
         self.ell_max = 30  # Spin cutoff for the a_chi function in blocks.py. This MUST be an even number
 
         # ---Pre-generated conformal block lattice parameters---
-        self.delta_start = np.array([5.8, 7.8, 9.8, 11.8, 13.8, 15.8, 17.8, 19.8])
-        self.delta_end_increment = 30.0
-        self.delta_sep = 0.0005
+        self.delta_start = np.array([5.8, 7.8, 9.8, 11.8, 13.8, 15.8, 17.8, 19.8])  # lower bounds
+        self.delta_sep = 0.0005  # jump in weights between each lattice point
+        self.delta_end_increment = 30.0  # maximum deltas are delta_start + delta_end_increment - delta_sep eg 35.7995
 
         # This is a list of the original 180 columns to delete from the '6d_blocks_spin*.csv' files
         self.z_kill_list = []
@@ -91,13 +89,13 @@ class ParametersSixD_SAC(ParametersSixD):
         When the soft-Actor-Critic algorithm should print to the console:
         - ``: no output.
         - `e`: print everytime reward is recalculated.
-        - `o`: only when faff_max is reached and a reinitialisation occurs.
+        - `o`: only when faff_max is reached and a re-initialisation occurs.
     faff_max : int
         Maximum number of steps spent searching for an improved reward without success.
-        When faff_max is reached a reinitialisation occurs.
+        When faff_max is reached a re-initialisation occurs.
         Higher value means algorithm spends more time searching for a better solution.
     pc_max : int
-        Maximum number of reinitialisations before window size decrease.
+        Maximum number of re-initialisations before window size decrease.
         Higher value means algorithm spends more time searching for a better solution.
     window_rate : float
         Search window size decrease rate. Range is (0, 1).
@@ -153,99 +151,93 @@ class ParametersSixD_SAC(ParametersSixD):
         super().__init__()
 
         # ---Output Parameters---
-        self.filename_stem = 'sac_v2_'
+        self.filename_stem = 'sac'
         self.verbose = 'o'  # When the SAC algorithm should print to the console:
         # e - print at every step
-        # o - only after a reinitialisation
+        # o - only after a re-initialisation
         # default is '' which produces no output
 
         # ---Learn Loop Paramaters---
-        self.faff_max = 50  # maximum time spent not improving
+        self.faff_max = 300  # maximum time spent not improving
 
         # ---Automation Run Parameters---
-        self.pc_max = 5  # max number of reinitialisations before window decrease
+        self.pc_max = 5  # max number of re-initialisations before window decrease
         self.window_rate = 0.7  # window decrease rate (between 1 and 0)
-        self.max_window_exp = 8  # maximum number of window changes
+        self.max_window_exp = 10  # maximum number of window changes
 
         # ---Spin Hierachy Parameters---
         self.same_spin_hierarchy = True  # same long multiplet operators with the same spin should be ordered
-        self.dyn_shift = 1.0  # set the gap between long multiplet same spin deltas
+        self.dyn_shift = 0.3  # set the gap between long multiplet same spin deltas
 
         # ---Environment Parameters---
         # set guessing run list for conformal weights
         self.guessing_run_list_deltas = np.array([0,
-                                                  0, 0, 0, 0, 0, 0, 0, 0,
+                                                  0, 0, 0, 0, 0, 0, 0, 0, 0,
                                                   1, 1, 1, 1, 1, 1, 1, 1,
                                                   1, 1, 1, 1, 1, 1, 1,
                                                   1, 1, 1, 1, 1, 1,
                                                   1, 1, 1, 1, 1,
                                                   1, 1, 1, 1,
                                                   1, 1, 1,
-                                                  1, 1,
-                                                  1], dtype=bool)
+                                                  1, 1], dtype=bool)
         # set guessing run list for ope coefficients
         self.guessing_run_list_opes = np.array([1,
-                                                1, 1, 1, 1, 1, 1, 1, 1,
+                                                1, 1, 1, 1, 1, 1, 1, 1, 1,
                                                 1, 1, 1, 1, 1, 1, 1, 1,
                                                 1, 1, 1, 1, 1, 1, 1,
                                                 1, 1, 1, 1, 1, 1,
                                                 1, 1, 1, 1, 1,
                                                 1, 1, 1, 1,
                                                 1, 1, 1,
-                                                1, 1,
-                                                1], dtype=bool)
+                                                1, 1], dtype=bool)
         # initial search window size for conformal weights
         # windows for D and B multiplets should be set to zero as they are fixed
         self.guess_sizes_deltas = np.array([0.0,
-                                            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                             10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0,
                                             10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0,
                                             10.0, 10.0, 10.0, 10.0, 10.0, 10.0,
                                             10.0, 10.0, 10.0, 10.0, 10.0,
                                             10.0, 10.0, 10.0, 10.0,
                                             10.0, 10.0, 10.0,
-                                            10.0, 10.0,
-                                            10.0])
+                                            10.0, 10.0])
         # initial search window size for OPE coeffs
         self.guess_sizes_opes = np.array([20,
-                                          20, 20, 20, 20, 20, 20, 20, 20,
+                                          20, 20, 20, 20, 20, 20, 20, 20, 20,
                                           20, 20, 20, 20, 20, 20, 20, 20,
                                           20, 20, 20, 20, 20, 20, 20,
                                           20, 20, 20, 20, 20, 20,
                                           20, 20, 20, 20, 20,
                                           20, 20, 20, 20,
                                           20, 20, 20,
-                                          20, 20,
-                                          20])
+                                          20, 20])
         # set minimum values for conformal weights
         # minimums for D and B multiplets are fixed as weights are known
         self.shifts_deltas = np.array([8.0,
-                                       9.0, 11.0, 13.0, 15.0, 17.0, 19.0, 21.0, 23.0,
+                                       9.0, 11.0, 13.0, 15.0, 17.0, 19.0, 21.0, 23.0, 25.0,
                                        6.1, 6.1, 6.1, 6.1, 6.1, 6.1, 6.1, 6.1,
                                        8.1, 8.1, 8.1, 8.1, 8.1, 8.1, 8.1,
                                        10.1, 10.1, 10.1, 10.1, 10.1, 10.1,
                                        12.1, 12.1, 12.1, 12.1, 12.1,
                                        14.1, 14.1, 14.1, 14.1,
                                        16.1, 16.1, 16.1,
-                                       18.1, 18.1,
-                                       20.1])
+                                       18.1, 18.1])
         # set minimum values for OPE coeffs
         self.shifts_opecoeffs = np.array([0,
-                                          0, 0, 0, 0, 0, 0, 0, 0,
+                                          0, 0, 0, 0, 0, 0, 0, 0, 0,
                                           0, 0, 0, 0, 0, 0, 0, 0,
                                           0, 0, 0, 0, 0, 0, 0,
                                           0, 0, 0, 0, 0, 0,
                                           0, 0, 0, 0, 0,
                                           0, 0, 0, 0,
                                           0, 0, 0,
-                                          0, 0,
-                                          0])
+                                          0, 0])
 
         # ---Starting Point Parameters---
         # initial configuration to explore around
         # set equal to combination of shifts_deltas and shifts_opecoeffs to effectively start from a zero solution
         self.global_best = np.array([8.0,
-                                     9.0, 11.0, 13.0, 15.0, 17.0, 19.0, 21.0, 23.0,
+                                     9.0, 11.0, 13.0, 15.0, 17.0, 19.0, 21.0, 23.0, 25.0,
                                      6.1, 6.1, 6.1, 6.1, 6.1, 6.1, 6.1, 6.1,
                                      8.1, 8.1, 8.1, 8.1, 8.1, 8.1, 8.1,
                                      10.1, 10.1, 10.1, 10.1, 10.1, 10.1,
@@ -253,18 +245,15 @@ class ParametersSixD_SAC(ParametersSixD):
                                      14.1, 14.1, 14.1, 14.1,
                                      16.1, 16.1, 16.1,
                                      18.1, 18.1,
-                                     20.1,
                                      0,
-                                     0, 0, 0, 0, 0, 0, 0, 0,
+                                     0, 0, 0, 0, 0, 0, 0, 0, 0,
                                      0, 0, 0, 0, 0, 0, 0, 0,
                                      0, 0, 0, 0, 0, 0, 0,
                                      0, 0, 0, 0, 0, 0,
                                      0, 0, 0, 0, 0,
                                      0, 0, 0, 0,
                                      0, 0, 0,
-                                     0, 0,
-                                     0
-                                     ])
+                                     0, 0])
         # initial reward to start with
         # set equal to 0.0 to start from a zero solution.
         self.global_reward_start = 0.0
