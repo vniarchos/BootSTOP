@@ -17,7 +17,7 @@ class ObjectiveFunWrapper:
 
 class Environment:
     """
-    Class used to record the current location in parameter space as well as the
+    Class used to record the current location in parameter space as well as the move around the environment
     """
 
     def __init__(self, func_wrapper, environment_dim, search_space_dim,
@@ -42,9 +42,9 @@ class Environment:
         action : ndarray
             The neural net's current prediction. Values in range [-1,1].
         largest : float
-            The value to be compared against current highest reward found.
+            The largest reward value to compare against.
         solution : ndarray
-            The solution which corresponds to the location at which `largest` is evaluated.
+            The solution to be used if in a non-guessing mode.
         """
         # updating location might be a theory dependent thing i.e. allowing some to be negative
         self.current_location = self.lower_bounds + abs(self.search_window_sizes * action
@@ -239,10 +239,10 @@ def soft_actor_critic(func,
             # increase the window scale exponent and decrease the search window sizes
             window_scale_exponent += 1
             environment.search_window_sizes = window_decrease_rate * environment.search_window_sizes
-            # reset the reinitialisation counter to zero
+            # reset the re-initialisation counter to zero
             pc = 0
 
-        # delete and re-instantiate the Learn class, this reinitialises the Agent class
+        # delete and re-instantiate the Learn class, this re-initialises the Agent class
         del lrn
         environment.reset_env()
         lrn = Learn(environment)
