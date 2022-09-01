@@ -1,7 +1,24 @@
 import numpy as np
 
 
-class z_data:
+class ZData:
+    """
+    A class for storing the sample of z-points.
+
+    Parameters
+    __________
+    zre : ndarray
+        Array containing the real parts.
+    zim : ndarray
+        Array containing the imaginary parts.
+    env_shape : int
+        The dimension of the z-sample.
+    z : ndarray
+        The z-points.
+    z_conj : ndarray
+        The complex conjugates of the z-points.
+
+    """
     def __init__(self):
         self.zre = np.array([0.5414285714285715, 0.6357142857142857, 0.5728571428571428,
                              0.5257142857142857, 0.51, 0.5571428571428572, 0.73,
@@ -116,6 +133,14 @@ class z_data:
         self.z_conj = self.z.conjugate()
 
     def kill_data(self, kill_list):
+        """
+        Deletes a number of z-points, their complex conjugates and recalculates the dimension.
+
+        Parameters
+        ----------
+        kill_list : list
+            A list of z-point positions to remove.
+        """
         self.z = np.delete(self.z, kill_list)
         self.z_conj = np.delete(self.z_conj, kill_list)
         self.env_shape = self.z.size
