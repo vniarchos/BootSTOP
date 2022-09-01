@@ -5,9 +5,12 @@ import numpy as np
 from neural_net.buffer import ReplayBuffer
 from neural_net.sac_networks import ActorNetwork, CriticNetwork, ValueNetwork
 
-# uncomment to turn off stochasticity and ensure reproducability
+# # uncomment to turn off stochasticity and ensure reproducibility
 # T.manual_seed(0)
 # T.use_deterministic_algorithms(True)
+# import random
+# random.seed(0)
+# np.random.seed(0)
 
 def weights_init(m):
     if isinstance(m, nn.Linear):
@@ -18,7 +21,7 @@ def weights_init(m):
 class Agent:
     def __init__(self, alpha=0.0005, beta=0.0005, input_dims=[8],
                  max_action=1.0, gamma=0.99, n_actions=2, max_size=100000, tau=0.001,
-                 layer1_size=256, layer2_size=256, batch_size=256, reward_scale=7):
+                 layer1_size=256, layer2_size=256, batch_size=256, reward_scale=7.0):
         self.gamma = gamma
         self.tau = tau
         self.memory = ReplayBuffer(max_size, input_dims, n_actions)
@@ -41,7 +44,7 @@ class Agent:
 
     def choose_action(self, observation):
         state = T.Tensor(np.array([observation])).to(self.actor.device)
-        [actions, _, sigma] = self.actor.sample_normal(state)
+        [actions, _, sigma] = self.actor.sample_normal(state, reparameterize=False)
         self.stdv = sigma.cpu().detach().numpy()[0]
 
         return actions.cpu().detach().numpy()[0]
