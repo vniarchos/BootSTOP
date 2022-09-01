@@ -13,8 +13,8 @@
 <!-- TOC -->
 
 ## Overview
-This code applies the soft actor critic algorithm to solve a truncated crossing equation 
-for a conformal field theory (CFT). See references [1], [2] and [3] for comprehensive background.
+This code applies the soft-Actor-Critic algorithm to solve a truncated crossing equation 
+for a conformal field theory (currently only the 6d (2,0) CFT). See references [1], [2] and [3] for comprehensive background.
 
 ## Getting started
 
