@@ -16,9 +16,6 @@
 This code applies the soft actor critic algorithm to solve a truncated crossing equation 
 for a conformal field theory (CFT). See references [1], [2] and [3] for comprehensive background.
 
-The code tries to maximise a reward. Each time an improved reward is found that reward and the corresponding CFT data 
-(conformal weights and OPE squared coefficients) are saved to a csv file.
-
 ## Getting started
 
 In this readme file we will describe how to quickly get started with using the
@@ -79,6 +76,9 @@ The sample of points in the complex plane is stored within *environment/data_z_s
 contained within `zre` or `zim` would mean having to re-compute all the *block_lattices/6d_blocks_spin#.csv* files in 
 order to avoid inconsistencies.
 
+The hyperparameters which control the behaviour of the neural networks can be altered by specifying non-default 
+parameter values when the Agent class in instantiated within the Learn class of *sac.py*. 
+
 ## Changing the pregenerated conformal blocks 
 
 The pregenerated conformal blocks are computed using Mathematica in tandem with QMUL's Apocrita high performance
@@ -93,7 +93,7 @@ of the conformal weights is set with `step` (we used 0.0005). The Mathematica co
 for all values of $z, \bar{z}$ in the z-sample with $\Delta$ starting at `floor` and increasing by `step` with 
 each pass of the loop until it reaches `ceiling`. Once the loop is completed the output is exported to a csv file.
 In practice setting `ceiling = floor - step + 1` with `step = 0.0005` allows the loop to complete in a reason amount
-of time (~75mins) and a wide range for $\Delta$ (up to `floor + 30`) can be built up by running in parallel on a 
+of time (~75mins) and a wide range for $\Delta$ (up to `floor + 30 - step`) can be built up by running in parallel on a 
 cluster. The final, large, csv file *6d_blocks_spin0.csv* is formed by running the script 
 *pregenerate_blocks/aggregate_block_data.py* with approriate values set for the variables.
 
