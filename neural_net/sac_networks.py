@@ -4,16 +4,20 @@ import torch.nn.functional as F
 import torch.nn as nn
 import torch.optim as optim
 from torch.distributions.normal import Normal
-import numpy as np
 
-# uncomment to turn off stochasticity and ensure reproducability
+# # uncomment to turn off stochasticity and ensure reproducibility
 # T.manual_seed(0)
 # T.use_deterministic_algorithms(True)
+# import random
+# random.seed(0)
+import numpy as np
+# np.random.seed(0)
 
 def weights_init(m):
         if isinstance(m, nn.Linear):
             nn.init.normal_(m.weight.data)
             nn.init.normal_(m.bias.data)
+
 
 class CriticNetwork(nn.Module):
     def __init__(self, beta, input_dims, n_actions, fc1_dims=64, fc2_dims=64,
