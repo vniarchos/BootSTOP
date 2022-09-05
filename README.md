@@ -53,7 +53,7 @@ in the pregenerated conformal blocks.
 - **z_kill_list:** Allows for a smaller z-point sample by specifying which points to remove.
 
 
-Within the subclass *Parameters_6D_sac*. These alter the soft-Actor-Critic behaviour.
+Within the subclass *ParametersSixD_SAC*. These alter the soft-Actor-Critic behaviour.
 - **filename_stem:** The name of the output file (note the filetype *.csv* is automatically appended along with an 
 optional integer - see Running the Code).
 - **verbose:** Controls how much output is printed to the python console.
