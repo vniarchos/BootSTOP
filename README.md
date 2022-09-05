@@ -14,12 +14,12 @@
 
 ## Overview
 This code applies the soft-Actor-Critic algorithm to solve a truncated crossing equation 
-for a conformal field theory (currently only the 6d (2,0) CFT). See references [1], [2] and [3] for comprehensive background.
+for a conformal field theory (currently only the 6D (2,0) CFT). See references [1], [2] and [3] for comprehensive background.
 
 ## Getting started
 
 In this readme file we will describe how to quickly get started with using the
-code. First things first, you will need to follow this [link](https://drive.google.com/drive/folders/1XwQmNnuCCUlXqT9MFmFNyFdTS_Ob_2lM?usp=sharing)
+code. First things first, you will need to follow this [link](https://drive.google.com/drive/folders/1myAXJzBhFl5eYI1iFimA4i5ukeinxzw5?usp=sharing)
 to download the pregenerated conformal block csv files (each file is around 0.2Gb) and place them within the *block_lattices* 
 folder.
 
@@ -108,7 +108,7 @@ cluster. The final, large, csv file *6d_blocks_spin0.csv* is formed by running t
 ## References
 
 - [1] G. Kantor, V. Niarchos, C. Papageorgakis and P. Richmond,
-*6d (2,0) Bootstrap with soft-Actor-Critic*, [arXiv:2209.xxxxx]
+*6D (2,0) Bootstrap with soft-Actor-Critic*, [arXiv:2209.xxxxx]
 - [2] G. Kantor, V. Niarchos and C. Papageorgakis,
 *Conformal bootstrap with reinforcement learning*,
 Phys. Rev. D 105 (2022) [arXiv:2108.09330](https://arxiv.org/abs/2108.09330)
