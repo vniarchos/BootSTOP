@@ -108,7 +108,7 @@ cluster. The final, large, csv file *6d_blocks_spin0.csv* is formed by running t
 ## References
 
 - [1] G. Kantor, V. Niarchos, C. Papageorgakis and P. Richmond,
-*6D (2,0) Bootstrap with soft-Actor-Critic*, [arXiv:2209.xxxxx]
+*6D (2,0) Bootstrap with soft-Actor-Critic*, [arXiv:2209.02801](https://arxiv.org/abs/2209.02801)
 - [2] G. Kantor, V. Niarchos and C. Papageorgakis,
 *Conformal bootstrap with reinforcement learning*,
 Phys. Rev. D 105 (2022) [arXiv:2108.09330](https://arxiv.org/abs/2108.09330)
