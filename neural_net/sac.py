@@ -1,4 +1,5 @@
 import numpy as np
+from numpy import linalg as LA
 from neural_net.sac_agent import Agent
 import environment.utils as utils
 
@@ -21,14 +22,18 @@ class Environment:
     """
 
     def __init__(self, func_wrapper, environment_dim, search_space_dim,
-                 lower_bounds, search_window_sizes, guessing_run_list):
+                 bounds, search_window_sizes, guessing_run_list,
+                 negative_list=None, neutral_list=None):
         self.func_wrapper = func_wrapper
         self.environment_dim = environment_dim
         self.search_space_dim = search_space_dim
-        self.lower_bounds = lower_bounds
+        self.lower_bounds = bounds[0]
+        self.upper_bounds = bounds[1]
         self.search_window_sizes = search_window_sizes
         self.guessing_run_list = guessing_run_list
-        self.current_location = lower_bounds
+        self.negative_list = negative_list
+        self.neutral_list = neutral_list
+        self.current_location = bounds[0]  # initialise to lower bounds
         self.current_constraints = np.zeros(self.environment_dim, dtype=np.float32)
         self.current_reward = None
         self.reward_improved = False
@@ -46,17 +51,43 @@ class Environment:
         solution : ndarray
             The solution to be used if in a non-guessing mode.
         """
-        # updating location might be a theory dependent thing i.e. allowing some to be negative
-        self.current_location = self.lower_bounds + abs(self.search_window_sizes * action
-                                                        + (1 - self.guessing_run_list) * solution)
+        # starting values for increments
+        increments = self.search_window_sizes * action + (1 - self.guessing_run_list) * solution
+        # assume positive_list is all indices
+        positive_list = list(range(self.search_space_dim))
+        if self.negative_list is not None:
+            increments[self.negative_list] = - abs(increments[self.negative_list])
+            # remove the negative_list indices from positive_list
+            positive_list = list(np.setdiff1d(positive_list, self.negative_list))
+        if self.neutral_list is not None:
+            # remove the neutral_list indices from positive_list
+            positive_list = list(np.setdiff1d(positive_list, self.neutral_list))
+
+        increments[positive_list] = + abs(increments[positive_list])
+
+        self.current_location = np.clip(self.lower_bounds + increments,
+                                        a_min=self.lower_bounds,
+                                        a_max=self.upper_bounds)  # by clipping we enforce the user specified bounds
 
         # evaluate the function at the updated location and update attributes
-        self.current_constraints, self.current_reward, self.current_location \
-            = self.func_wrapper.fun(self.current_location)
+        self.current_constraints, self.current_location = self.func_wrapper.fun(self.current_location)
+
+        self.compute_reward(self.current_constraints)
 
         # check if we've found a new maximum
         if self.current_reward > largest:
             self.reward_improved = True
+
+    def compute_reward(self, constraints):
+        """
+        Computes the reward and updates current_reward attribute
+
+        Parameters
+        ----------
+        constraints: ndarray
+            An array of crossing equation values.
+        """
+        self.current_reward = 1 / LA.norm(constraints)
 
     def reset_env(self):
         """
@@ -109,7 +140,8 @@ class Learn:
             self.agent.remember(self.observation, action, current_reward, self.observation_, self.done)
             # learn from updated buffer
             self.agent.learn()
-            self.observation = self.observation_  # update observation to be the current constraints
+            # update observation to be the current constraints
+            self.observation = self.observation_
             # append the current reward to the list of previous rewards generated within the loop
             self.rewards.append(current_reward)
 
@@ -151,7 +183,7 @@ class Learn:
 def soft_actor_critic(func,
                       environment_dim,
                       search_space_dim,
-                      lower_bounds,
+                      bounds,
                       search_window_sizes,
                       pc_max,
                       window_decrease_rate,
@@ -163,16 +195,18 @@ def soft_actor_critic(func,
                       starting_reward,
                       x0,
                       verbose='',
+                      negative_list=None,
+                      neutral_list=None,
                       args=()):
     """
-    Apply the soft-Actor-Critic algorithm to a function.
+    Apply the soft-Actor-Critic (SAC) algorithm to a function.
 
     Parameters
     ----------
     func : callable
         The function to be maximised.
     environment_dim : int
-        The number of points in the complex plane the function is evaluated at.
+        The environment dimension.
     search_space_dim : int
         The total number of parameters to be solved for.
     max_window_changes : int
@@ -189,8 +223,8 @@ def soft_actor_critic(func,
         Initial reward value for SAC algorithm to try and beat.
     x0 : ndarray
         An array containing the initial solution to search around in parameter space.
-    lower_bounds : ndarray
-        An array containing absolute lower bounds on parameter search domain.
+    bounds : tuple
+        A tuple containing absolute lower bounds and upper bounds on parameter search domain.
     search_window_sizes : ndarray
         An array containing initial search window sizes.
     guessing_run_list : ndarray
@@ -212,12 +246,12 @@ def soft_actor_critic(func,
     However, if a non-zero starting_reward is specified and no improvement is found then no output is saved.
     """
 
-    # Wrapper for the reward function
-    # the function needs to return an array of constraints, the reward and a (possibly) modified current_location
+    # Wrapper for the function from which we calculate the reward
+    # the function needs to return an array of constraints and a (possibly) modified current_location
     func_wrapper = ObjectiveFunWrapper(func, *args)
     #
-    environment = Environment(func_wrapper, environment_dim, search_space_dim, lower_bounds, search_window_sizes,
-                              guessing_run_list)
+    environment = Environment(func_wrapper, environment_dim, search_space_dim, bounds, search_window_sizes,
+                              guessing_run_list, negative_list=negative_list, neutral_list=neutral_list)
     lrn = Learn(environment)
     # set the initial window size reduction exponent, pc counter and best_reward
     window_scale_exponent = 0
@@ -248,7 +282,7 @@ def soft_actor_critic(func,
         lrn = Learn(environment)
 
     # when finished looping print the final reward and corresponding CFT data
-    best_reward_location = x0 + lower_bounds
+    best_reward_location = x0 + bounds[0]  # this is solution + lower bounds
     utils.output_to_console('Maximum reward: %.16f' % best_reward)
     utils.output_to_console('Location of maximum reward: ')
     utils.output_to_console(best_reward_location.tolist())
