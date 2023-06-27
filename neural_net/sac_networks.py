@@ -10,7 +10,7 @@ from torch.distributions.normal import Normal
 # T.use_deterministic_algorithms(True)
 # import random
 # random.seed(0)
-import numpy as np
+# import numpy as np
 # np.random.seed(0)
 
 def weights_init(m):
