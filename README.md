@@ -23,8 +23,8 @@ and the 6D (2,0) SCFT (see [3]). See [1-4] and the references within for compreh
 ## Installation
 For installation instructions see [here](requirements/getting_started.md).
 
-Then you will need to follow this [link](https://drive.google.com/drive/folders/1myAXJzBhFl5eYI1iFimA4i5ukeinxzw5?usp=sharing)
-from where you should copy the pre-generated conformal block files and place them within the relevant *block_lattices* 
+Then you will need to [follow this link](https://xand-stapleton.github.io/bootpages/blocks/)
+from where you should download the pre-generated conformal block files, and move them within the relevant *block_lattices* 
 folder in your local repository.
 
 ## Running the code
