@@ -12,7 +12,7 @@
 ## Overview
 BootSTOP is a python package for determining CFT data (OPE-coefficients squared and scaling dimensions) 
 which minimise a theory's truncated crossing equation. To do this the code can apply either a custom PyTorch 
-implementation of the soft-Actor-Critic algorithm
+implementation of the Soft-Actor-Critic algorithm
 or one of the algorithms within the PyGMO package (information about PyGMO can be found 
 [here](https://esa.github.io/pygmo2/)). 
 
@@ -50,4 +50,4 @@ Phys. Rev. D 105 (2022) [arXiv:2108.09330](https://arxiv.org/abs/2108.09330)
 *6D (2,0) bootstrap with soft-actor-critic algorithm*,
 Phys. Rev. D 107 (2023) [arXiv:2209.02801](https://arxiv.org/abs/2209.02801)
 - [4] V. Niarchos, C. Papageorgakis, P. Richmond, A. G. Stapleton and M. Wooley,
-*Bootstrability in Line-Defect CFT with Improved Truncation Methods*, [arXiv:2306.xxxxx]
+*Bootstrability in Line-Defect CFT with Improved Truncation Methods*, [arXiv:2306.15730](https://arxiv.org/abs/2306.15730)
