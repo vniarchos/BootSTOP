@@ -1,8 +1,8 @@
-# BootSTOP (Bootstrap STochastic OPtimizer)
+# BootSTOP (Bootstrap STochastic OPtimiser)
 
 ---
 <!-- TOC -->
-* [BootSTOP (Bootstrap STochastic OPtimizer)](#bootstop-bootstrap-stochastic-optimizer)
+* [BootSTOP (Bootstrap STochastic OPtimiser)](#bootstop-bootstrap-stochastic-optimiser)
   * [Overview](#overview)
   * [Installation](#installation)
   * [Running the code](#running-the-code)
