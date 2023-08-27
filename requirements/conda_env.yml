@@ -14,7 +14,7 @@ dependencies:
   - brotli-bin=1.0.9=h1a8c8d9_8
   - bzip2=1.0.8=h3422bc3_4
   - ca-certificates=2023.5.7=hf0a4a13_0
-  - certifi=2023.5.7=pyhd8ed1ab_0
+  - certifi=2023.7.22
   - charset-normalizer=3.1.0=pyhd8ed1ab_0
   - cloudpickle=2.2.1=pyhd8ed1ab_0
   - colorama=0.4.6=pyhd8ed1ab_0
