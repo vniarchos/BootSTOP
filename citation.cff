@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite both it and the referenced paper."
+title: "BootSTOP"
+authors:
+  - family-names: Niarchos
+    given-names: V.
+  - family-names: Papageorgakis
+    given-names: C.
+  - family-names: Richmond
+    given-names: P.
+  - family-names: Stapleton
+    given-names: A. G.
+  - family-names: Woolley
+    given-names: M.
+date-released: 2023
+version: "7bde2fa"
+repository-code: https://github.com/vniarchos/bootstop
+url: https://github.com/vniarchos/bootstop
+type: software
+references:
+  - type: article
+    title: "Bootstrability in line-defect CFTs with improved truncation methods"
+    authors:
+      - family-names: Niarchos
+        given-names: V.
+      - family-names: Papageorgakis
+        given-names: C.
+      - family-names: Richmond
+        given-names: P.
+      - family-names: Stapleton
+        given-names: A. G.
+      - family-names: Woolley
+        given-names: M.
+    journal: "Physical Review D"
+    volume: "108"
+    issue: "10"
+    pages: "105027"
+    year: 2023
+    month: 11
+    publisher: "American Physical Society"
+    doi: "10.1103/PhysRevD.108.105027"
+    url: "https://link.aps.org/doi/10.1103/PhysRevD.108.105027"
